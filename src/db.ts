@@ -4,29 +4,28 @@ import { user } from "./models";
 
 const url = "mongodb+srv://samperisisamuel:FedeChiesa07@UserDB.yvd6jyw.mongodb.net/?retryWrites=true&w=majority";
 
-export const tryConnectionDB = async (): Promise<boolean> => {
+export const tryConnectionDB = async () => {
     const client = await new MongoClient(url);
     try{
         await (await client.connect()).db("UserDB");
-        return true;
     } catch(err) {
         console.error(err);
-        return false;
+        throw new Error("err...");
     }
 };
-
+/*
 export const createCollection = async (name: string): Promise<boolean> => {
     const client = await new MongoClient(url);
     try{
         const db = await (await client.connect()).db("UserDB");
-        await db.createCollection<user>("UsersCollection");
+        await db.createCollection<user>(name);
         return true;
     } catch(err) {
         console.error(err);
         return false;
     }
 }
-
+*/
 export const insertOne = async (newObj: user) => {
     const client = new MongoClient(url);
     try{
@@ -35,5 +34,16 @@ export const insertOne = async (newObj: user) => {
     } catch(e) {
         console.error(e);
         throw new Error("Insert err...");
+    }
+}
+
+export const find = async (email: string): Promise<user | null> => {
+    const client = new MongoClient(url);
+    try{
+        await client.connect();
+        return await client.db("UserDB").collection<user>("UsersCollection").findOne({email: email}, {projection: {_id: 0}});
+    } catch(e) {
+        console.error(e);
+        return null;
     }
 }
