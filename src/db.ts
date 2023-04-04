@@ -1,10 +1,11 @@
 
 import { MongoClient } from "mongodb";
-import { user } from "./models";
+import { userDB } from "./models";
 
 const url = "mongodb+srv://samperisisamuel:FedeChiesa07@UserDB.yvd6jyw.mongodb.net/?retryWrites=true&w=majority";
 
 export const tryConnectionDB = async () => {
+    console.log("asbias");
     const client = await new MongoClient(url);
     try{
         await (await client.connect()).db("UserDB");
@@ -26,7 +27,7 @@ export const createCollection = async (name: string): Promise<boolean> => {
     }
 }
 */
-export const insertOne = async (newObj: user) => {
+export const insertOne = async (newObj: userDB) => {
     const client = new MongoClient(url);
     try{
         await client.connect();
@@ -37,11 +38,11 @@ export const insertOne = async (newObj: user) => {
     }
 }
 
-export const find = async (email: string): Promise<user | null> => {
+export const find = async (email: string): Promise<userDB | null> => {
     const client = new MongoClient(url);
     try{
         await client.connect();
-        return await client.db("UserDB").collection<user>("UsersCollection").findOne({email: email}, {projection: {_id: 0}});
+        return await client.db("UserDB").collection<userDB>("UsersCollection").findOne({email: email}, {projection: {_id: 0}});
     } catch(e) {
         console.error(e);
         return null;
