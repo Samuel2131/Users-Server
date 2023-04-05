@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "npm run build && node ./build/app.js",
-    "test": "npm run build && mocha ./build/tests/*.js"
+    "start": "set DB=./src/db/database.json&& npm run build && node ./build/app.js",
+    "test": "set DB=./src/db/databaseTest.json&& npm run build && mocha ./build/tests/*.js"
   },
   "author": "",
   "license": "ISC",

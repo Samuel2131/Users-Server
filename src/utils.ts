@@ -6,9 +6,9 @@ export const sshKey = "b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAl
 
 export const write = async (user: User) => {
     try{
-        const arr = JSON.parse(await fs.readFileSync("./database.json", "utf-8").toString());
+        const arr = JSON.parse(await fs.readFileSync(process.env.DB as string, "utf-8").toString());
         arr.push(user)
-        fs.writeFileSync("./database.json", JSON.stringify(arr, null, 2));
+        fs.writeFileSync(process.env.DB as string, JSON.stringify(arr, null, 2));
     } catch(err) {
         console.error(err);
     }
@@ -16,7 +16,7 @@ export const write = async (user: User) => {
 
 export const overwrite = async (arrUsers: Array<User>) => {
     try{
-        fs.writeFileSync("./database.json", JSON.stringify(arrUsers, null, 2));
+        fs.writeFileSync(process.env.DB as string, JSON.stringify(arrUsers, null, 2));
     } catch(err) {
         console.error(err);
     }
@@ -24,7 +24,7 @@ export const overwrite = async (arrUsers: Array<User>) => {
 
 export const read = async (): Promise<Array<User>> => {
     try{
-        const arr: Array<User> = JSON.parse(await fs.readFileSync("./database.json", "utf-8").toString());
+        const arr: Array<User> = JSON.parse(await fs.readFileSync(process.env.DB as string, "utf-8").toString());
         return arr;
     } catch(err) {
         console.error(err);

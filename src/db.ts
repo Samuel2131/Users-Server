@@ -1,50 +1,72 @@
 
-import { MongoClient } from "mongodb";
-import { userDB } from "./models";
+import mongoose from "mongoose";
+import { UserDB, User } from "./models";
 
-const url = "mongodb+srv://samperisisamuel:FedeChiesa07@UserDB.yvd6jyw.mongodb.net/?retryWrites=true&w=majority";
+const url = "mongodb+srv://samperisisamuel:FedeChiesa07@UserDB.yvd6jyw.mongodb.net/UserDB?retryWrites=true&w=majority";
+
+mongoose.connect(url);
 
 export const tryConnectionDB = async () => {
-    console.log("asbias");
-    const client = await new MongoClient(url);
-    try{
-        await (await client.connect()).db("UserDB");
-    } catch(err) {
-        console.error(err);
-        throw new Error("err...");
-    }
+    const user = new UserDB({
+        name: "Samuel",
+        email: "samperisi.samuel@gmail.com",
+        surname: "Samperisi",
+        password: "************",
+        verify: "************"
+    });
+    user.save()
 };
-/*
-export const createCollection = async (name: string): Promise<boolean> => {
-    const client = await new MongoClient(url);
+
+export const insertOne = async (newObj: User) => {
     try{
-        const db = await (await client.connect()).db("UserDB");
-        await db.createCollection<user>(name);
-        return true;
-    } catch(err) {
-        console.error(err);
-        return false;
-    }
-}
-*/
-export const insertOne = async (newObj: userDB) => {
-    const client = new MongoClient(url);
-    try{
-        await client.connect();
-        await client.db("UserDB").collection("UsersCollection").insertOne(newObj);
+        const user = new UserDB(newObj);
+        user.save();
     } catch(e) {
         console.error(e);
         throw new Error("Insert err...");
     }
 }
 
-export const find = async (email: string): Promise<userDB | null> => {
-    const client = new MongoClient(url);
+export const getAll = (): Promise<User[]> => {
     try{
-        await client.connect();
-        return await client.db("UserDB").collection<userDB>("UsersCollection").findOne({email: email}, {projection: {_id: 0}});
+        return UserDB.find({});
+    } catch (err) {
+        console.error(err);
+        return Promise.resolve([]);
+    }
+}
+
+export const replaceOne = async (filter: string, newUser: User) => {
+    try {
+        await UserDB.replaceOne({verify: filter}, newUser);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+export const find = async (email: string): Promise<User | null> => {
+    try{
+        return await UserDB.findOne({email: email});
     } catch(e) {
         console.error(e);
         return null;
+    }
+}
+
+export const findWithVerify = async (verify: string): Promise<User | null> => {
+    try{
+        return await UserDB.findOne({verify: verify});
+    } catch(e) {
+        console.error(e);
+        return null;
+    }
+}
+
+export const isIn = async (userEmail: string): Promise<boolean> => {
+    try{
+        return (await getAll()).some(({email}) => email === userEmail);
+    } catch (err) {
+        console.error(err);
+        return false;
     }
 }

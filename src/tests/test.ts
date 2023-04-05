@@ -2,9 +2,10 @@
 import request from "supertest";
 require("chai").should();
 import bcrypt from "bcrypt";
-import {app, users, saltRounds} from "../app";
+import {app, saltRounds} from "../app";
 import { User } from "../models";
 import { v4 } from "uuid";
+import { getAll } from "../db";
 
 describe("endpoints", () => {
   const user = {
@@ -13,11 +14,13 @@ describe("endpoints", () => {
     email: "carloleonard83@gmail.com",
     password: "t7esttest",
   };
-  describe("signup", () => {
+  describe.only("signup", () => {
+    /*
     after(() => {
       const index = users.findIndex(({ email }) => email === user.email);
       users.splice(index, 1);
     });
+    */
     it("test 400 wrong email", async () => {
       const { status } = await request(app)
         .post("/signup")
@@ -58,8 +61,10 @@ describe("endpoints", () => {
   });
 
   describe("validate", () => {
+    let users:User[] = [];
     let newUser: User;
-    before(() => {
+    before(async () => {
+      users = await getAll();
       newUser = {
         id: v4(),
         name: "Carlo",
@@ -87,9 +92,11 @@ describe("endpoints", () => {
   });
 
   describe("login", () => {
+    let users:User[] = [];
     let newUser: User;
     let password = "password";
     before(async () => {
+      users = await getAll();
       newUser = {
         id: v4(),
         name: "Carlo",
@@ -125,9 +132,11 @@ describe("endpoints", () => {
   });
 
   describe("login with not confirmed user", () => {
+    let users:User[] = [];
     let newUser: User;
     let password = "password";
     before(async () => {
+      users = await getAll();
       newUser = {
         id: v4(),
         name: "Carlo",
@@ -151,9 +160,11 @@ describe("endpoints", () => {
   });
 
   describe("me", () => {
+    let users:User[] = [];
     let newUser: User;
     let password = "password";
     before(async () => {
+      users = await getAll();
       newUser = {
         id: v4(),
         name: "Carlo",
@@ -169,7 +180,7 @@ describe("endpoints", () => {
     });
     it("test 200 token wrong", async () => {
       const { status } = await request(app)
-        .post(`/login`)
+        .get(`/me`)
         .set({ authorization: "wrong-token" });
       status.should.be.equal(400);
     });
