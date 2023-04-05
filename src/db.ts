@@ -2,37 +2,27 @@
 import mongoose from "mongoose";
 import { UserDB, User } from "./models";
 
-const url = "mongodb+srv://samperisisamuel:FedeChiesa07@UserDB.yvd6jyw.mongodb.net/UserDB?retryWrites=true&w=majority";
+const url = `mongodb+srv://samperisisamuel:FedeChiesa07@UserDB.yvd6jyw.mongodb.net/${process.env.DB}?retryWrites=true&w=majority`;
 
 mongoose.connect(url);
-
-export const tryConnectionDB = async () => {
-    const user = new UserDB({
-        name: "Samuel",
-        email: "samperisi.samuel@gmail.com",
-        surname: "Samperisi",
-        password: "************",
-        verify: "************"
-    });
-    user.save()
-};
 
 export const insertOne = async (newObj: User) => {
     try{
         const user = new UserDB(newObj);
-        user.save();
+        await user.save();
+        return user;
     } catch(e) {
         console.error(e);
         throw new Error("Insert err...");
     }
 }
 
-export const getAll = (): Promise<User[]> => {
+export const getAll = async (): Promise<User[]> => {
     try{
-        return UserDB.find({});
+        return await UserDB.find({});
     } catch (err) {
         console.error(err);
-        return Promise.resolve([]);
+        return [];
     }
 }
 
@@ -68,5 +58,13 @@ export const isIn = async (userEmail: string): Promise<boolean> => {
     } catch (err) {
         console.error(err);
         return false;
+    }
+}
+
+export const drop = async () => {
+    try {
+        await UserDB.deleteMany({});
+    } catch (err){
+        console.error(err);
     }
 }

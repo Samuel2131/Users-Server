@@ -4,8 +4,7 @@ import { body, header, validationResult } from "express-validator";
 import { write, overwrite, read, sshKey } from "./utils";
 import bycript from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
-import { find, findWithVerify, getAll, insertOne, replaceOne, tryConnectionDB, isIn } from "./db";
-import { User } from "./models";
+import { find, findWithVerify, getAll, insertOne, replaceOne, isIn } from "./db";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { promises as fs } from "fs";
 
@@ -27,11 +26,9 @@ app.post("/signup", body("name").notEmpty().isString(), body("surname").notEmpty
     body.password = await bycript.hash(body.password, saltRounds);
     body.verify = uuidv4();
     try {
-        await insertOne(body);
-        console.log(body.verify);
-        delete body.password;
-        delete body.verify;
-        res.status(201).json(body)
+        let user = await insertOne(body);
+        console.log(user.verify);
+        res.status(201).json({id: user.id, name: user.name, surname: user.surname, email: user.email});
     } catch (e) {
         console.error(e);
         res.json({message: "Insert err..."});

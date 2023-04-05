@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import {app, saltRounds} from "../app";
 import { User } from "../models";
 import { v4 } from "uuid";
-import { getAll } from "../db";
+import { getAll, drop, insertOne } from "../db";
 
 describe("endpoints", () => {
   const user = {
@@ -14,13 +14,10 @@ describe("endpoints", () => {
     email: "carloleonard83@gmail.com",
     password: "t7esttest",
   };
-  describe.only("signup", () => {
-    /*
-    after(() => {
-      const index = users.findIndex(({ email }) => email === user.email);
-      users.splice(index, 1);
+  describe("signup", () => {
+    after( async () => {
+      await drop();
     });
-    */
     it("test 400 wrong email", async () => {
       const { status } = await request(app)
         .post("/signup")
@@ -61,10 +58,8 @@ describe("endpoints", () => {
   });
 
   describe("validate", () => {
-    let users:User[] = [];
     let newUser: User;
     before(async () => {
-      users = await getAll();
       newUser = {
         id: v4(),
         name: "Carlo",
@@ -73,11 +68,10 @@ describe("endpoints", () => {
         password: "cript-password",
         verify: v4(),
       };
-      users.push(newUser);
+      await insertOne(newUser);
     });
-    after(() => {
-      const index = users.findIndex(({ email }) => email === user.email);
-      users.splice(index, 1);
+    after(async () => {
+      await drop();
     });
     it("test 400 Invalid token", async () => {
       const { status } = await request(app).get(`/validate/fake-token`);
@@ -86,17 +80,16 @@ describe("endpoints", () => {
     it("test 200 set token", async () => {
       const { status } = await request(app).get(`/validate/${newUser.verify}`);
       status.should.be.equal(200);
-      const userFinded = users.find(({ email }) => email === newUser.email);
+      const users = await getAll();
+      const userFinded = {...users.find(({ email }) => email === newUser.email)};
       userFinded!.should.not.have.property("verify");
     });
   });
 
   describe("login", () => {
-    let users:User[] = [];
     let newUser: User;
     let password = "password";
     before(async () => {
-      users = await getAll();
       newUser = {
         id: v4(),
         name: "Carlo",
@@ -104,11 +97,10 @@ describe("endpoints", () => {
         email: "carloleonardi83@gmail.com",
         password: await bcrypt.hash(password, saltRounds),
       };
-      users.push(newUser);
+      await insertOne(newUser);
     });
-    after(() => {
-      const index = users.findIndex(({ email }) => email === user.email);
-      users.splice(index, 1);
+    after(async () => {
+      await drop();
     });
     it("test 400 wrong data", async () => {
       const { status } = await request(app)
@@ -132,11 +124,9 @@ describe("endpoints", () => {
   });
 
   describe("login with not confirmed user", () => {
-    let users:User[] = [];
     let newUser: User;
     let password = "password";
     before(async () => {
-      users = await getAll();
       newUser = {
         id: v4(),
         name: "Carlo",
@@ -145,11 +135,10 @@ describe("endpoints", () => {
         password: await bcrypt.hash(password, saltRounds),
         verify: v4(),
       };
-      users.push(newUser);
+      await insertOne(newUser);
     });
-    after(() => {
-      const index = users.findIndex(({ email }) => email === user.email);
-      users.splice(index, 1);
+    after(async () => {
+      await drop();
     });
     it("test 401 login not success (while email is not verified)", async () => {
       const { status } = await request(app)
@@ -160,11 +149,9 @@ describe("endpoints", () => {
   });
 
   describe("me", () => {
-    let users:User[] = [];
     let newUser: User;
     let password = "password";
     before(async () => {
-      users = await getAll();
       newUser = {
         id: v4(),
         name: "Carlo",
@@ -172,11 +159,10 @@ describe("endpoints", () => {
         email: "carloleonardi83@gmail.com",
         password: await bcrypt.hash(password, saltRounds),
       };
-      users.push(newUser);
+      await insertOne(newUser);
     });
-    after(() => {
-      const index = users.findIndex(({ email }) => email === user.email);
-      users.splice(index, 1);
+    after(async () => {
+      await drop();
     });
     it("test 200 token wrong", async () => {
       const { status } = await request(app)
@@ -203,3 +189,5 @@ describe("endpoints", () => {
     });
   });
 });
+
+
