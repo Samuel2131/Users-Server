@@ -11,7 +11,7 @@ describe("endpoints", () => {
   const user = {
     name: "Carlo",
     surname: "Leonardi",
-    email: "carloleonard83@gmail.com",
+    email: "carlleonard@gmail.com",
     password: "t7esttest",
   };
   describe("signup", () => {

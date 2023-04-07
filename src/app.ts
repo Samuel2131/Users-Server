@@ -1,15 +1,15 @@
-//Use process.env
+
 import express, {Request, Response, NextFunction} from "express"
 import { body, header, validationResult } from "express-validator";
-import { write, overwrite, read, sshKey } from "./utils";
 import bycript from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
 import { find, findWithVerify, getAll, insertOne, replaceOne, isIn } from "./db";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { promises as fs } from "fs";
 
 export const app = express();
 app.use(express.json());
+
+const sshKey = "**********";
 
 export const saltRounds = 10;
 
@@ -77,13 +77,4 @@ app.get("/me", header("authorization").isJWT(), showErrors, async ({headers}, re
     }
 });
 
-app.listen(3001, async () => {
-    /*
-    if(process.env.DB === "./src/db/databaseTest.json") {
-        await fs.writeFile(process.env.DB as string, JSON.stringify([]));
-        users = JSON.parse(await fs.readFile(process.env.DB as string, "binary"));
-    }
-    else users = await read();
-    */
-    console.log("Server is running");
-});  
+app.listen(3001, async () => console.log("Server is running"));  

@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 import { UserDB, User } from "./models";
 
-const url = `mongodb+srv://samperisisamuel:FedeChiesa07@UserDB.yvd6jyw.mongodb.net/${process.env.DB}?retryWrites=true&w=majority`;
+const url = `mongodb+srv://samperisisamuel:${process.env.PASSWORD}@UserDB.yvd6jyw.mongodb.net/${process.env.DB}?retryWrites=true&w=majority`;
 
 mongoose.connect(url);
 
